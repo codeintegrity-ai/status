@@ -261,6 +261,17 @@ params:
   # BOOLEAN; `true`, `false`
   disableDarkMode: false
 
+  # Allow the custom/* partial overrides in
+  # layouts/partials/custom/ to be rendered.
+  #
+  # We use custom/meta.html to emit the brand
+  # icon <link> tags, which cState does not
+  # output on its own.
+  #
+  # Default: `false`
+  # BOOLEAN; `true`, `false`
+  enableCustomHTML: true
+
   # Should we show the logo or the title
   # of the status page?
   #
