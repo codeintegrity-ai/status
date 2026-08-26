@@ -1,0 +1,8 @@
+# Hugo build output — CI builds and deploys this from source
+# (.github/workflows/static.yml); committing it only creates drift.
+/public/
+/resources/
+.hugo_build.lock
+
+# macOS
+.DS_Store

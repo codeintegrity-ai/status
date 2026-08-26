@@ -1,0 +1,7 @@
+# path<TAB>upstream blob sha in themes/cstate at vendoring time
+# Regenerate after re-syncing: scripts/check-theme-overrides.sh --update
+partials/meta.html	86cea30cfa819284de25e17afb676e7322635cb8
+index.json	572480e59ce2db83de2563aa871d0f6a91362e1d
+index.xml	89f76b058001828319ad4f411382e5ae5fb00043
+_default/list.xml	5b7e2ce46f0d6e44a06b2a67e5c9bb147d56d3f0
+partials/index/summary.html	d31eb66a47e9c5987b0cdbc5d33a4ecb019868bb

@@ -56,6 +56,11 @@ buildFuture: true
 # What language do you want to use for the
 # html[lang] definition?
 #
+# NOTE: this was `languageCode` until Hugo
+# v0.158.0 deprecated that key in favour of
+# `locale`. cState still reads it via
+# .Site.LanguageCode, which falls back to this.
+#
 # Does not change language of site
 # itself.
 #
@@ -64,7 +69,7 @@ buildFuture: true
 #
 # See:  https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 # Also: https://www.w3schools.com/tags/ref_language_codes.asp
-languageCode: en
+locale: en
 
 # What translation file should cState use?
 # You can also define whether missing
@@ -162,6 +167,14 @@ params:
       description: Application platform and user dashboard
       category: Services
       link: https://app.codeintegrity.ai
+    - name: Documentation
+      description: Product and API documentation
+      category: Services
+      link: https://docs.codeintegrity.ai
+    - name: Trust Center
+      description: Security, compliance and subprocessor information
+      category: Services
+      link: https://trust.codeintegrity.ai
 
   # What date format to use?
   #
@@ -260,6 +273,17 @@ params:
   # Default: `false`
   # BOOLEAN; `true`, `false`
   disableDarkMode: false
+
+  # Allow the custom/* partial overrides in
+  # layouts/partials/custom/ to be rendered.
+  #
+  # We use custom/meta.html to emit the brand
+  # icon <link> tags, which cState does not
+  # output on its own.
+  #
+  # Default: `false`
+  # BOOLEAN; `true`, `false`
+  enableCustomHTML: true
 
   # Should we show the logo or the title
   # of the status page?
@@ -373,8 +397,6 @@ params:
 # Please do not change them if you do not
 # know what you are doing.
 theme: cstate
-
-preserveTaxonomyNames: true
 
 taxonomies:
   affected: affected

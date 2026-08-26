@@ -1,33 +1,128 @@
-# cState Site v6
+# CodeIntegrity Status
 
-This is the default cState status page website directory/folder.
+The status page for CodeIntegrity services, published at
+**<https://status.codeintegrity.ai>**.
 
-* Example site repository link (you are here): https://github.com/cstate/example
-* Main cState source code repository: https://github.com/cstate/cstate
+Built with [Hugo](https://gohugo.io) and the
+[cState](https://github.com/cstate/cstate) theme (vendored as a git submodule),
+and deployed to GitHub Pages by
+[`.github/workflows/static.yml`](.github/workflows/static.yml) on every push to
+`master`.
 
-## Are you updating? Use these commands
+## Local development
 
-Download your site with all the directories. `git clone --recursive <your repo link goes here>`
+```bash
+git clone --recursive https://github.com/codeintegrity-ai/status.git
+cd status
+hugo serve
+```
 
-Update the cState theme submodule. `git submodule foreach git pull origin master`
+If you cloned without `--recursive`, fetch the theme with
+`git submodule update --init --recursive`.
 
-In the parent directory, type `hugo serve`. Check to see if everything is working.
+The site build output (`public/`) is **not** committed — CI builds it from
+source. Use the same Hugo version CI pins (`HUGO_VERSION` in the workflow).
 
-Then do `git add -A; git commit -m "Update cState"; git push origin <branch, probably main or master>`. Your status page is now updated and uploaded.
+## Posting an incident
 
+Incidents are Markdown files in `content/issues/`. Create one per incident:
 
-## For maintainers (probably not for you)
+```bash
+hugo new content issues/2026-08-26-api-latency.md
+```
 
-Maintainers need to update both cstate/cstate and cstate/example for each new version.
+```markdown
+---
+title: Elevated API latency
+date: 2026-08-26 14:30:00
+resolved: false
+severity: disrupted
+affected:
+  - Dashboard
+section: issue
+---
 
-Download this repo with all the directories. `git clone --recursive -b master https://github.com/cstate/example.git`
+We are investigating elevated latency on the dashboard.
+```
 
-Add your changes from cstate/cstate's exampleSite folder.
+- `severity` is one of `notice`, `disrupted`, or `down`.
+- `affected` entries must match a system `name` in [`config.yml`](config.yml).
+- Set `resolved: true` and add a `resolvedWhen` timestamp to close it out.
+- **Dates must be UTC** — relative times ("5 min ago") are computed from them.
 
-Update the cState theme submodule. `git submodule foreach git pull origin master`
+Post follow-up updates newest-first in the body, stamping each with the `track`
+shortcode so it gets its own timestamp:
 
-Then push `git add -A; git commit -m "Update cState vX.X.X"; git push origin master`.
+```markdown
+*Resolved* - Latency is back to baseline. {{< track "2026-08-26 15:10:00" >}}
 
-## License
+*Investigating* - We are looking into it. {{< track "2026-08-26 14:30:00" >}}
+```
 
-MIT © Mantas Vilčinskas
+## Configuration
+
+[`config.yml`](config.yml) defines the monitored systems, categories, colors,
+and page metadata. Two settings are load-bearing and easy to break:
+
+- `enableCustomHTML: true` — required for
+  [`layouts/partials/custom/meta.html`](layouts/partials/custom/meta.html),
+  which emits the brand icon `<link>` tags. cState renders no icon tags of its
+  own, so turning this off silently drops every favicon.
+- `googleAnalytics: UA-00000000-1` — this placeholder is cState's *disabled*
+  sentinel, not a stale ID. Removing the key makes the theme inject a GA script
+  with an empty tracking ID.
+
+## Brand assets
+
+The wordmark and icons in [`static/`](static/) are generated in the
+`codeintegrity-fe` repo under `brand-assets/` (`pnpm generate:all`). Do not
+hand-edit them here — regenerate upstream and copy the outputs over:
+
+| `static/` file | Source in `codeintegrity-fe` |
+| --- | --- |
+| `logo.svg` | `public/brand/logos/codeintegrity-wordmark-light.svg` |
+| `favicon.ico`, `favicon.svg` | `brand-assets/assets/logo/output/` |
+| `apple-touch-icon.png` | `brand-assets/assets/logo/output/apple-icon.png` |
+
+`logo.png` and the `favicon-*.png` sizes are rasterized from the SVGs above.
+
+## Vendored theme overrides
+
+`layouts/` carries copies of five cState templates, each patched with a single
+fix that config cannot reach:
+
+| Override | Fix |
+| --- | --- |
+| `partials/meta.html` | `.Site.LanguageCode` → `.Site.Language.Locale` |
+| `index.json`, `index.xml`, `_default/list.xml` | same |
+| `partials/index/summary.html` | RSS link `{{ .Site.BaseURL }}/index.xml` → `absURL`, which was rendering a doubled slash |
+
+`.Site.LanguageCode` was deprecated in Hugo v0.158.0, so the build would have
+broken outright on a future Hugo bump. Both defects are already fixed on the
+theme's unreleased `v7` branch — **these overrides are a bridge, and should be
+deleted once v7 ships**, not carried forward.
+
+A copied template silently goes stale the moment upstream edits the original,
+so CI guards them:
+
+```bash
+./scripts/check-theme-overrides.sh
+```
+
+It records the upstream blob SHA each override was copied from and fails the
+build when `themes/cstate` no longer matches, printing the upstream diff. After
+re-syncing an override, re-baseline with `--update`. Do not hand-edit the
+vendored files — re-copy from the theme and re-apply the one-line fix named in
+each file's header.
+
+## Updating the theme
+
+```bash
+git submodule update --remote themes/cstate
+./scripts/check-theme-overrides.sh   # tells you if a vendored override drifted
+hugo serve                           # verify, then commit the submodule pointer
+```
+
+If the check reports drift, re-copy the affected template from the theme,
+re-apply the one-line fix named in its header, then run
+`./scripts/check-theme-overrides.sh --update`.
