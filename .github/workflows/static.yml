@@ -37,6 +37,8 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Verify vendored theme overrides are in sync
+        run: ./scripts/check-theme-overrides.sh
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v6

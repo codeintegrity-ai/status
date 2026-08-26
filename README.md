@@ -86,9 +86,43 @@ hand-edit them here — regenerate upstream and copy the outputs over:
 
 `logo.png` and the `favicon-*.png` sizes are rasterized from the SVGs above.
 
+## Vendored theme overrides
+
+`layouts/` carries copies of five cState templates, each patched with a single
+fix that config cannot reach:
+
+| Override | Fix |
+| --- | --- |
+| `partials/meta.html` | `.Site.LanguageCode` → `.Site.Language.Locale` |
+| `index.json`, `index.xml`, `_default/list.xml` | same |
+| `partials/index/summary.html` | RSS link `{{ .Site.BaseURL }}/index.xml` → `absURL`, which was rendering a doubled slash |
+
+`.Site.LanguageCode` was deprecated in Hugo v0.158.0, so the build would have
+broken outright on a future Hugo bump. Both defects are already fixed on the
+theme's unreleased `v7` branch — **these overrides are a bridge, and should be
+deleted once v7 ships**, not carried forward.
+
+A copied template silently goes stale the moment upstream edits the original,
+so CI guards them:
+
+```bash
+./scripts/check-theme-overrides.sh
+```
+
+It records the upstream blob SHA each override was copied from and fails the
+build when `themes/cstate` no longer matches, printing the upstream diff. After
+re-syncing an override, re-baseline with `--update`. Do not hand-edit the
+vendored files — re-copy from the theme and re-apply the one-line fix named in
+each file's header.
+
 ## Updating the theme
 
 ```bash
 git submodule update --remote themes/cstate
-hugo serve   # verify, then commit the submodule pointer
+./scripts/check-theme-overrides.sh   # tells you if a vendored override drifted
+hugo serve                           # verify, then commit the submodule pointer
 ```
+
+If the check reports drift, re-copy the affected template from the theme,
+re-apply the one-line fix named in its header, then run
+`./scripts/check-theme-overrides.sh --update`.
