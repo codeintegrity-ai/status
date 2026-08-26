@@ -56,6 +56,11 @@ buildFuture: true
 # What language do you want to use for the
 # html[lang] definition?
 #
+# NOTE: this was `languageCode` until Hugo
+# v0.158.0 deprecated that key in favour of
+# `locale`. cState still reads it via
+# .Site.LanguageCode, which falls back to this.
+#
 # Does not change language of site
 # itself.
 #
@@ -64,7 +69,7 @@ buildFuture: true
 #
 # See:  https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 # Also: https://www.w3schools.com/tags/ref_language_codes.asp
-languageCode: en
+locale: en
 
 # What translation file should cState use?
 # You can also define whether missing
@@ -384,8 +389,6 @@ params:
 # Please do not change them if you do not
 # know what you are doing.
 theme: cstate
-
-preserveTaxonomyNames: true
 
 taxonomies:
   affected: affected
