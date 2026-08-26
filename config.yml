@@ -167,6 +167,14 @@ params:
       description: Application platform and user dashboard
       category: Services
       link: https://app.codeintegrity.ai
+    - name: Documentation
+      description: Product and API documentation
+      category: Services
+      link: https://docs.codeintegrity.ai
+    - name: Trust Center
+      description: Security, compliance and subprocessor information
+      category: Services
+      link: https://trust.codeintegrity.ai
 
   # What date format to use?
   #
